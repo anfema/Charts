@@ -21,6 +21,8 @@ import CoreGraphics
 
 public class LineChartRenderer: LineRadarChartRenderer
 {
+    private let offset: CGFloat = 20
+    
     public weak var dataProvider: LineChartDataProvider?
     
     public init(dataProvider: LineChartDataProvider?, animator: ChartAnimator?, viewPortHandler: ChartViewPortHandler)
@@ -123,6 +125,8 @@ public class LineChartRenderer: LineRadarChartRenderer
         
         if (size - minx >= 2)
         {
+            valueToPixelMatrix.tx += offset
+            
             var prevDx: CGFloat = 0.0
             var prevDy: CGFloat = 0.0
             var curDx: CGFloat = 0.0
@@ -146,7 +150,7 @@ public class LineChartRenderer: LineRadarChartRenderer
                 next = entryCount > j + 1 ? dataSet.entryForIndex(j + 1) : cur
                 
                 if next == nil { break }
-                
+            
                 prevDx = CGFloat(cur.xIndex - prevPrev.xIndex) * intensity
                 prevDy = CGFloat(cur.value - prevPrev.value) * intensity
                 curDx = CGFloat(next.xIndex - prev.xIndex) * intensity
@@ -299,7 +303,8 @@ public class LineChartRenderer: LineRadarChartRenderer
             animator = animator
             else { return }
         
-        let valueToPixelMatrix = trans.valueToPixelMatrix
+        var valueToPixelMatrix = trans.valueToPixelMatrix
+        valueToPixelMatrix.tx += offset
         
         let entryCount = dataSet.entryCount
         let isDrawSteppedEnabled = dataSet.mode == .Stepped
@@ -560,7 +565,8 @@ public class LineChartRenderer: LineRadarChartRenderer
                 guard let formatter = dataSet.valueFormatter else { continue }
                 
                 let trans = dataProvider.getTransformer(dataSet.axisDependency)
-                let valueToPixelMatrix = trans.valueToPixelMatrix
+                var valueToPixelMatrix = trans.valueToPixelMatrix
+                valueToPixelMatrix.tx += offset
                 
                 // make sure the values do not interfear with the circles
                 var valOffset = Int(dataSet.circleRadius * 1.75)
@@ -644,7 +650,8 @@ public class LineChartRenderer: LineRadarChartRenderer
             }
             
             let trans = dataProvider.getTransformer(dataSet.axisDependency)
-            let valueToPixelMatrix = trans.valueToPixelMatrix
+            var valueToPixelMatrix = trans.valueToPixelMatrix
+            valueToPixelMatrix.tx += offset
             
             let entryCount = dataSet.entryCount
             
